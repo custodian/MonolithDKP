@@ -9,6 +9,7 @@ local _G = _G;
 core.MonDKP = {};       -- UI Frames global
 local MonDKP = core.MonDKP;
 
+--[[
 core.faction = UnitFactionGroup("player")
 if core.faction == "Horde" then
   core.CColors = {   -- class colors
@@ -35,6 +36,77 @@ elseif core.faction == "Alliance" then
   }
   core.classes = { "Druid", "Hunter", "Mage", "Paladin", "Priest", "Rogue", "Warlock", "Warrior" }
 end
+--]]
+
+--[[
+core.faction = UnitFactionGroup("player")
+local tc_colors = {
+	["Druid"] = { r = 1, g = 0.49, b = 0.04, hex = "FF7D0A" },
+	["Hunter"] = {  r = 0.67, g = 0.83, b = 0.45, hex = "ABD473" },
+	["Mage"] = { r = 0.25, g = 0.78, b = 0.92, hex = "40C7EB" },
+	["Priest"] = { r = 1, g = 1, b = 1, hex = "FFFFFF" },
+	["Rogue"] = { r = 1, g = 0.96, b = 0.41, hex = "FFF569" },
+	["Shaman"] = { r = 0.96, g = 0.55, b = 0.73, hex = "F58CBA" },
+	["Paladin"] = { r = 0.96, g = 0.55, b = 0.73, hex = "F58CBA" },
+	["Warlock"] = { r = 0.53, g = 0.53, b = 0.93, hex = "8787ED" },
+	["Warrior"] = { r = 0.78, g = 0.61, b = 0.43, hex = "C79C6E" }
+}
+
+local tc_classes = {}
+if core.faction == "Horde" then
+  tc_classes = { "Druid", "Hunter", "Mage", "Priest", "Rogue", "Shaman", "Warlock", "Warrior" }
+elseif core.faction == "Alliance" then
+  tc_classes = { "Druid", "Hunter", "Mage", "Paladin", "Priest", "Rogue", "Warlock", "Warrior" }
+end
+
+local tc_names_male = {}
+FillLocalizedClassList(tc_names_male)
+
+core.CColors = {}
+core.classes = {}
+for i = 1, #tc_classes do
+	local cname = tc_classes[i]
+	local lname_male = tc_names_male[string.upper(cname)]
+	local lname_female = tc_names_female[string.upper(cname)]
+
+	core.CColors[lname_male] = tc_colors[cname]
+	core.CColors[lname_female] = tc_colors[cname]
+	core.CColors[]
+	table.insert(core.classes, lname_male)
+end
+--]]
+
+-- [[
+core.faction = UnitFactionGroup("player")
+local tc_colors = {
+	["Druid"] = { r = 1, g = 0.49, b = 0.04, hex = "FF7D0A" },
+	["Hunter"] = {  r = 0.67, g = 0.83, b = 0.45, hex = "ABD473" },
+	["Mage"] = { r = 0.25, g = 0.78, b = 0.92, hex = "40C7EB" },
+	["Priest"] = { r = 1, g = 1, b = 1, hex = "FFFFFF" },
+	["Rogue"] = { r = 1, g = 0.96, b = 0.41, hex = "FFF569" },
+	["Shaman"] = { r = 0.96, g = 0.55, b = 0.73, hex = "F58CBA" },
+	["Paladin"] = { r = 0.96, g = 0.55, b = 0.73, hex = "F58CBA" },
+	["Warlock"] = { r = 0.53, g = 0.53, b = 0.93, hex = "8787ED" },
+	["Warrior"] = { r = 0.78, g = 0.61, b = 0.43, hex = "C79C6E" }
+}
+
+local tc_classes = {}
+if core.faction == "Horde" then
+  tc_classes = { "Druid", "Hunter", "Mage", "Priest", "Rogue", "Shaman", "Warlock", "Warrior" }
+elseif core.faction == "Alliance" then
+  tc_classes = { "Druid", "Hunter", "Mage", "Paladin", "Priest", "Rogue", "Warlock", "Warrior" }
+end
+
+core.CColors = {}
+core.classes = {}
+for i = 1, #tc_classes do
+	local cname = tc_classes[i]
+	local lname = string.upper(cname)
+	core.CColors[lname] = tc_colors[cname]
+	table.insert(core.classes, lname)
+end
+--]]
+
 
 --------------------------------------
 -- Addon Defaults
