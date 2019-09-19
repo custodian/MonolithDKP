@@ -97,7 +97,9 @@ elseif core.faction == "Alliance" then
   tc_classes = { "Druid", "Hunter", "Mage", "Paladin", "Priest", "Rogue", "Warlock", "Warrior" }
 end
 
-core.CColors = {}
+core.CColors = {
+	["UNKNOWN"] = { r = 0.627, g = 0.627, b = 0.627, hex = "A0A0A0" }
+}
 core.classes = {}
 for i = 1, #tc_classes do
 	local cname = tc_classes[i]
@@ -203,7 +205,12 @@ core.CurView = "all"
 
 function MonDKP:GetCColors(class)
   if core.CColors then 
-    local c = core.CColors[class] or core.CColors;
+	local c
+    if class then
+		c = core.CColors[class] or core.CColors["UNKNOWN"];
+	else
+		c = core.CColors
+	end
     return c;
   else
     return false;
@@ -285,7 +292,6 @@ function MonDKP:CheckOfficer()      -- checks if user is an officer IF core.IsOf
       core.IsOfficer = false;
     end
   end
-  -- core.IsOfficer = true
 end
 
 function MonDKP:GetGuildRankGroup(index)                -- returns all members within a specific rank index as well as their index in the guild list (for use with GuildRosterSetPublicNote(index, "msg") and GuildRosterSetOfficerNote)
@@ -313,16 +319,16 @@ function MonDKP:GetThemeColor()
 end
 
 function MonDKP:GenerateSeed()
-	local seed = tonumber(os.date("!%y%m%d%H%M%S")) -- using utc times instead of time()
+	local seed = tonumber(date("!%y%m%d%H%M%S")) -- using utc times instead of time()
 	return seed
 end
 
 function MonDKP:RosterSeedUpdate(index)
 	local oldseed, note = MonDKP:RosterSeedExtract(index)
 	local newseed = MonDKP:GenerateSeed()
-	local textseed = "{MonDKP|" .. tostring(newseed) .. "}"
+	local textseed = "{MonDKP=" .. tostring(newseed) .. "}"
 	if oldseed > 0 then
-	    note = string.gsub(note, "{MonDKP|(%d+)}", textseed)
+	    note = string.gsub(note, "{MonDKP=(%d+)}", textseed)
 	else
 	    note = note .. " " .. textseed
 	end
@@ -333,7 +339,7 @@ end
 function MonDKP:RosterSeedExtract(index)
 	local seed, note
 	_,_,_,_,_,_,note = GetGuildRosterInfo(index)
-	seed = string.match(note, "{MonDKP|(%d+)}")
+	seed = string.match(note, "{MonDKP=(%d+)}")
 	if not seed then
 	    seed = 0
     end
@@ -351,7 +357,6 @@ end
 
 function MonDKP:GetPlayerDKP(player)
   local search = MonDKP:Table_Search(MonDKP_DKPTable, player)
-  local dkp;
 
   if search then
     return MonDKP_DKPTable[search[1][1]].dkp

@@ -180,10 +180,10 @@ end
 
 local function AddTargetToDKPTable()
 	local name = UnitName("target");
-	local class = UnitClass("target");
+	local _,class = UnitClass("target");
 	local c;
 
-	local search = MonDKP:Table_Search(MonDKP_DKPTable, UnitName("target"))
+	local search = MonDKP:Table_Search(MonDKP_DKPTable, name)
 
 	if not search then
 		tinsert(MonDKP_DKPTable, {
