@@ -285,20 +285,22 @@ function MonDKP:CheckOfficer()      -- checks if user is an officer IF core.IsOf
       core.IsOfficer = false;
     end
   end
+  -- core.IsOfficer = true
 end
 
 function MonDKP:GetGuildRankGroup(index)                -- returns all members within a specific rank index as well as their index in the guild list (for use with GuildRosterSetPublicNote(index, "msg") and GuildRosterSetOfficerNote)
-  local name, rank, note;                               -- local temp = MonDKP:GetGuildRankGroup(1)
+  local name, rank, seed;                               -- local temp = MonDKP:GetGuildRankGroup(1)
   local group = {}                                      -- print(temp[1]["name"])
   local guildSize,_,_ = GetNumGuildMembers();
 
   if IsInGuild() then
     for i=1, tonumber(guildSize) do
-      name,_,rank,_,_,_,note = GetGuildRosterInfo(i)
+      name,_,rank = GetGuildRosterInfo(i)
+	  seed = MonDKP:RosterSeedExtract(i)
       rank = rank+1;
       name = strsub(name, 1, string.find(name, "-")-1)  -- required to remove server name from player (can remove in classic if this is not an issue)
       if rank == index then
-        tinsert(group, { name = name, index = i, note = note })
+        tinsert(group, { name = name, index = i, seed = seed })
       end
     end
     return group;
@@ -310,11 +312,38 @@ function MonDKP:GetThemeColor()
   return c;
 end
 
+function MonDKP:GenerateSeed()
+	local seed = tonumber(os.date("!%y%m%d%H%M%S")) -- using utc times instead of time()
+	return seed
+end
+
+function MonDKP:RosterSeedUpdate(index)
+	local oldseed, note = MonDKP:RosterSeedExtract(index)
+	local newseed = MonDKP:GenerateSeed()
+	local textseed = "{MonDKP|" .. tostring(newseed) .. "}"
+	if oldseed > 0 then
+	    note = string.gsub(note, "{MonDKP|(%d+)}", textseed)
+	else
+	    note = note .. " " .. textseed
+	end
+	GuildRosterSetPublicNote(index, note)
+end
+
+function MonDKP:RosterSeedExtract(index)
+	local seed, note
+	_,_,_,_,_,_,note = GetGuildRosterInfo(i)
+	seed = string.match(note, "{MonDKP|(%d+)}")
+	if not seed then
+	    seed = 0
+    end
+	return tonumber(seed), note
+end
+
 function MonDKP:UpdateSeeds()		-- updates seeds on leaders note as well as all 3 tables
-	local curTime = time()
+	local curTime = MonDKP:GenerateSeed()
 
 	local leader = MonDKP:GetGuildRankGroup(1)
-	GuildRosterSetPublicNote(leader[1].index, curTime)
+	MonDKP:RosterSeedUpdate(leader[1].index, curTime)
 	MonDKP_DKPTable.seed = curTime
 	MonDKP_DKPHistory.seed = curTime
 	MonDKP_Loot.seed = curTime
