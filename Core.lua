@@ -327,11 +327,12 @@ function MonDKP:RosterSeedUpdate(index)
 	    note = note .. " " .. textseed
 	end
 	GuildRosterSetPublicNote(index, note)
+	return newseed
 end
 
 function MonDKP:RosterSeedExtract(index)
 	local seed, note
-	_,_,_,_,_,_,note = GetGuildRosterInfo(i)
+	_,_,_,_,_,_,note = GetGuildRosterInfo(index)
 	seed = string.match(note, "{MonDKP|(%d+)}")
 	if not seed then
 	    seed = 0
@@ -340,13 +341,12 @@ function MonDKP:RosterSeedExtract(index)
 end
 
 function MonDKP:UpdateSeeds()		-- updates seeds on leaders note as well as all 3 tables
-	local curTime = MonDKP:GenerateSeed()
-
 	local leader = MonDKP:GetGuildRankGroup(1)
-	MonDKP:RosterSeedUpdate(leader[1].index, curTime)
-	MonDKP_DKPTable.seed = curTime
-	MonDKP_DKPHistory.seed = curTime
-	MonDKP_Loot.seed = curTime
+	local seed = MonDKP:RosterSeedUpdate(leader[1].index)
+	
+	MonDKP_DKPTable.seed = seed
+	MonDKP_DKPHistory.seed = seed
+	MonDKP_Loot.seed = seed
 end
 
 function MonDKP:GetPlayerDKP(player)
