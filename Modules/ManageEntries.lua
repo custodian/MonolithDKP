@@ -149,7 +149,7 @@ local function AddGuildToDKPTable(rank)
 		name = strsub(name, 1, string.find(name, "-")-1)			-- required to remove server name from player (can remove in classic if this is not an issue)
 		local search = MonDKP:Table_Search(MonDKP_DKPTable, name)
 
-		if not search and rankIndex <= rank then
+		if not search and rankIndex == rank then
 			tinsert(MonDKP_DKPTable, {
 				player=name,
 				class=class,
@@ -453,7 +453,7 @@ function MonDKP:ManageEntries()
 	MonDKP.ConfigTab3.AddGuildToDKP:SetScript("OnClick", function ()	-- confirmation dialog to add user(s)
 		if curIndex ~= nil then
 			StaticPopupDialogs["ADD_GUILD_MEMBERS"] = {
-				text = "Are you sure you'd like to add all guild members that are rank \""..curRank.."\" or above?",
+				text = "Are you sure you'd like to add all guild members that are rank \""..curRank.."\"?",
 				button1 = "Yes",
 				button2 = "No",
 				OnAccept = function()
