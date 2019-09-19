@@ -20,7 +20,7 @@
 			<Font font="Fonts\bHEI01B.TTF" height="14" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="russian">
-			<Font font="Fonts\ARIALN.TTF" height="16" outline="NORMAL"/>
+			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\ubuntu_bold.ttf" height="12"/>
 		</Member>
 	</FontFamily>
 	<FontFamily  name="MonDKPTinyOutline" virtual="true">
@@ -37,7 +37,7 @@
 			<Font font="Fonts\bHEI01B.TTF" height="14" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="russian">
-			<Font font="Fonts\ARIALN.TTF" height="16" outline="NORMAL"/>
+			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\ubuntu_bold.ttf" height="12" outline="NORMAL"/>
 		</Member>
 	</FontFamily>
 	<FontFamily  name="MonDKPSmall" virtual="true">
@@ -54,7 +54,7 @@
 			<Font font="Fonts\bHEI01B.TTF" height="14" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="russian">
-			<Font font="Fonts\ARIALN.TTF" height="16" outline="NORMAL"/>
+			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\ubuntu_bold.ttf" height="12"/>
 		</Member>
 	</FontFamily>
 	<FontFamily  name="MonDKPSmallOutline" virtual="true">
@@ -71,7 +71,7 @@
 			<Font font="Fonts\bHEI01B.TTF" height="14" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="russian">
-			<Font font="Fonts\ARIALN.TTF" height="16" outline="NORMAL"/>
+			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\ubuntu_bold.ttf" height="12" outline="NORMAL"/>
 		</Member>
 	</FontFamily>
 	<FontFamily  name="MonDKPNormal" virtual="true">
@@ -88,7 +88,7 @@
 			<Font font="Fonts\bHEI01B.TTF" height="14" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="russian">
-			<Font font="Fonts\ARIALN.TTF" height="16" outline="NORMAL"/>
+			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\ubuntu_bold.ttf" height="13"/>
 		</Member>
 	</FontFamily>
 	<FontFamily  name="MonDKPNormalOutline" virtual="true">
@@ -105,7 +105,7 @@
 			<Font font="Fonts\bHEI01B.TTF" height="14" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="russian">
-			<Font font="Fonts\ARIALN.TTF" height="16" outline="NORMAL"/>
+			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\ubuntu_bold.ttf" height="13" outline="NORMAL"/>
 		</Member>
 	</FontFamily>
 	<FontFamily  name="MonDKPLarge" virtual="true">
@@ -122,7 +122,7 @@
 			<Font font="Fonts\bHEI01B.TTF" height="14" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="russian">
-			<Font font="Fonts\ARIALN.TTF" height="16" outline="NORMAL"/>
+			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\uf_font.ttf" height="24"/>
 		</Member>
 	</FontFamily>
 	<Font name="MonDKPLarge" virtual="true">
@@ -533,5 +533,3 @@
 		</Scripts>
 	</Slider>
 </Ui>
-
-
