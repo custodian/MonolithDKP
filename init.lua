@@ -58,6 +58,8 @@ MonDKP.Commands = {
 		MonDKP:Print("|cff00cc66!bid (or !bid <value>)|r - Bid on current item when bidding is opened.");
 		MonDKP:Print("|cff00cc66!dkp (or !dkp <player_name>)|r - Returns your current DKP (Or DKP of <player_name>)");
 	end,
+	["test"] = function()
+	end,
 };
 
 local function HandleSlashCommands(str)
