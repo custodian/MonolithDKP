@@ -850,6 +850,11 @@ function MonDKP:CreateTimer()
 	f.itemIcon:SetColorTexture(0, 0, 0, 1)
 	f.itemIcon:SetSize(25, 25);
 
+	f.hideButton = MonDKP:CreateButton("BOTTOMRIGHT", f.border, "TOPRIGHT", 0, 0, "Hide")
+	f.hideButton:SetScript("OnClick", function()
+		MonDKP.BidTimer:Hide();
+	end)
+	
 	return f;
 end
 
