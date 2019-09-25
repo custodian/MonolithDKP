@@ -231,6 +231,8 @@ function MonDKP:OnInitialize(event, name)		-- This is the FIRST function to run 
 		if not MonDKP_DB.modes.channels then MonDKP_DB.modes.channels = { raid = true, whisper = true, guild = true } end
 		if not MonDKP_DB.modes.costvalue then MonDKP_DB.modes.costvalue = "Integer" end
 		if not MonDKP_DB.modes.rolls or not MonDKP_DB.modes.rolls.min then MonDKP_DB.modes.rolls = { min = 1, max = 100, UsePerc = false, AddToMax = 0 } end
+		
+		MonDKP.DKPTable_activeFilter = ""
 
 	    ------------------------------------
 	    --	Import SavedVariables

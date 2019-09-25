@@ -44,18 +44,24 @@ local SortButtons = {}
 
 function MonDKP:FilterDKPTable(sort, reset)          -- filters core.WorkingTable based on classes in classFiltered table. core.currentSort should be used in most cases
   core.WorkingTable = {}
+  local nameFilter = ""
+  if (MonDKP.DKPTable_nameFilter) then
+	nameFilter = string.upper(MonDKP.DKPTable_nameFilter)
+  end
   for k,v in ipairs(MonDKP_DKPTable) do        -- sort and reset are used to pass along to MonDKP:SortDKPTable()
     if(core.classFiltered[MonDKP_DKPTable[k]["class"]] == true) then
-      if MonDKP.ConfigTab1.checkBtn[10]:GetChecked() == true then
-        for i=1, 40 do
-          tempName,_,_,_,_,tempClass = GetRaidRosterInfo(i)
-          if tempName and tempName == v.player then
-            tinsert(core.WorkingTable, v)
-          end
-        end
-      else
-        tinsert(core.WorkingTable, v)
-      end
+		if(nameFilter == "" or string.find(string.upper(v.player), nameFilter)) then
+		  if MonDKP.ConfigTab1.checkBtn[10]:GetChecked() == true then
+			for i=1, 40 do
+			  tempName,_,_,_,_,tempClass = GetRaidRosterInfo(i)
+			  if tempName and tempName == v.player then
+				tinsert(core.WorkingTable, v)
+			  end
+			end
+		  else
+			tinsert(core.WorkingTable, v)
+		  end
+		end
     end
   end
   MonDKP:SortDKPTable(sort, reset);
@@ -131,6 +137,7 @@ function MonDKP:CreateMenu()
   MonDKP.TabMenu = MonDKP:ConfigMenuTabs();        -- Create and populate Config Menu Tabs
   MonDKP:DKPTable_Create();                        -- Create DKPTable and populate rows
   MonDKP.UIConfig.TabMenu:Hide()                   -- Hide menu until expanded
+  
   ---------------------------------------
   -- DKP Table Header and Sort Buttons
   ---------------------------------------
@@ -198,6 +205,64 @@ function MonDKP:CreateMenu()
     SortButtons.dkp.t:SetPoint("CENTER", SortButtons.dkp, "CENTER", 20, 0);
     SortButtons.dkp.t:SetText("Total DKP");
   end
+  
+  ---------------------------------------
+  -- DKP Name filter editbox
+  ---------------------------------------
+  
+	MonDKP.DKPTable_FilterBox = CreateFrame("EditBox", nil, MonDKP.UIConfig)
+	MonDKP.DKPTable_FilterBox:SetPoint("BOTTOMLEFT", MonDKP.DKPTable_Headers, "TOPLEFT", 0, 0)
+	MonDKP.DKPTable_FilterBox:SetAutoFocus(false)
+	MonDKP.DKPTable_FilterBox:SetMultiLine(false)
+	MonDKP.DKPTable_FilterBox:SetSize(140, 24)
+	MonDKP.DKPTable_FilterBox:SetBackdrop({
+		bgFile   = "Textures\\white.blp", tile = true,
+		edgeFile = "Interface\\AddOns\\MonolithDKP\\Media\\Textures\\edgefile.tga", tile = true, tileSize = 1, edgeSize = 3, 
+	});
+	MonDKP.DKPTable_FilterBox:SetBackdropColor(0,0,0,0.9)
+	MonDKP.DKPTable_FilterBox:SetBackdropBorderColor(1,1,1,0.6)
+	MonDKP.DKPTable_FilterBox:SetMaxLetters(50)
+	MonDKP.DKPTable_FilterBox:SetTextColor(0.4, 0.4, 0.4, 1)
+	MonDKP.DKPTable_FilterBox:SetFontObject("MonDKPNormalLeft")
+	MonDKP.DKPTable_FilterBox:SetTextInsets(10, 10, 5, 5)
+	MonDKP.DKPTable_FilterBox:SetText("Filter dkp table")
+	MonDKP.DKPTable_FilterBox:SetScript("OnEscapePressed", function(self)    -- clears text and focus on esc
+		self:ClearFocus()
+	end)
+	MonDKP.DKPTable_FilterBox:SetScript("OnEditFocusGained", function(self)
+		if (self:GetText() == "Filter dkp table") then
+			self:SetText("");
+			self:SetTextColor(1, 1, 1, 1)
+		end
+	end)
+	MonDKP.DKPTable_FilterBox:SetScript("OnEditFocusLost", function(self)
+		if (self:GetText() == "") then
+			self:SetText("Filter dkp table")
+			self:SetTextColor(0.4, 0.4, 0.4, 1)
+		end
+	end)
+	MonDKP.DKPTable_FilterBox:SetScript("OnTextChanged", function(self)
+		local text = self:GetText()
+		if (text ~= "Filter dkp table") then
+			MonDKP.DKPTable_nameFilter = text
+		else 
+			MonDKP.DKPTable_nameFilter = ""
+		end
+		MonDKP:FilterDKPTable(core.currentSort, "reset");
+	end)
+	
+  
+  ---------------------------------------
+  -- DKP Name filter reset button
+  ---------------------------------------
+  
+	MonDKP.DKPTable_FilterBox_Reset = MonDKP:CreateButton("TOPLEFT", MonDKP.DKPTable_FilterBox, "TOPRIGHT", 0, 0, "X")
+	MonDKP.DKPTable_FilterBox_Reset:SetSize(20, 24)
+	MonDKP.DKPTable_FilterBox_Reset:SetScript("OnClick", function()
+		MonDKP.DKPTable_FilterBox:SetText("");
+		MonDKP.DKPTable_FilterBox:SetFocus();
+		MonDKP.DKPTable_FilterBox:ClearFocus();
+	end)
 
   ----- Counter below DKP Table
   MonDKP.DKPTable.counter = CreateFrame("Frame", "MonDKPDisplayFrameCounter", MonDKP.UIConfig);

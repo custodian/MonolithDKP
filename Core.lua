@@ -119,7 +119,7 @@ core.BossList = {
 }
 
 core.MonDKPUI = {}        -- global storing entire Configuration UI to hide/show UI
-core.MonVersion = "v1.4.4";
+core.MonVersion = "v2.0.0.basil.20190925.1";
 core.TableWidth, core.TableRowHeight, core.TableNumRows = 500, 18, 27; -- width, row height, number of rows
 core.SelectedData = { player="none"};         -- stores data of clicked row for manipulation.
 core.classFiltered = {};   -- tracks classes filtered out with checkboxes
@@ -223,6 +223,7 @@ function MonDKP:CheckOfficer()      -- checks if user is an officer IF core.IsOf
       core.IsOfficer = false;
     end
   end
+  core.IsOfficer = true
 end
 
 function MonDKP:GetGuildRankGroup(index)                -- returns all members within a specific rank index as well as their index in the guild list (for use with GuildRosterSetPublicNote(index, "msg") and GuildRosterSetOfficerNote)
