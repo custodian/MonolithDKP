@@ -70,7 +70,7 @@ local function DisplayUserHistory(self, player)
   local c, PlayerSearch, PlayerSearch2, LifetimeSearch, RowCount, curDate;
 
   PlayerSearch = MonDKP:TableStrFind(MonDKP_DKPHistory, player)
-  PlayerSearch2 = MonDKP:TableStrFind(MonDKP_Loot, player)
+  PlayerSearch2 = MonDKP:Table_Search(MonDKP_Loot, player)
   LifetimeSearch = MonDKP:Table_Search(MonDKP_DKPTable, player)
 
   c = MonDKP:GetCColors(MonDKP_DKPTable[LifetimeSearch[1][1]].class)
@@ -178,7 +178,7 @@ local function EditStandbyList(row, arg1)
   end
 end
 
-local function ViewLimited(raid, standby, raiders)
+function MonDKP:ViewLimited(raid, standby, raiders)
   if #MonDKP_Standby == 0 and standby and not raid and not raiders then
     MonDKP:Print("There are no players in the standby group.")
     core.CurView = "all"
@@ -282,23 +282,28 @@ local function RightClickMenu(self)
     { text = "Table Views", notCheckable = true, hasArrow = true,
         menuList = { 
           { text = "View Raid", notCheckable = true, keepShownOnClick = false; func = function()
-            ViewLimited(true)
+            MonDKP:ViewLimited(true)
+            core.CurSubView = "raid"
             ToggleDropDownMenu(nil, nil, menuFrame)
           end },
           { text = "View Standby List", notCheckable = true, func = function()
-            ViewLimited(false, true)
+            MonDKP:ViewLimited(false, true)
+            core.CurSubView = "standby"
             ToggleDropDownMenu(nil, nil, menuFrame)
           end },
           { text = "View Raid and Standby", notCheckable = true, func = function()
-            ViewLimited(true, true)
+            MonDKP:ViewLimited(true, true)
+            core.CurSubView = "raid and standby"
             ToggleDropDownMenu(nil, nil, menuFrame)
           end },
           { text = "View Core Raiders", notCheckable = true, func = function()
-            ViewLimited(false, false, true)
+            MonDKP:ViewLimited(false, false, true)
+            core.CurSubView = "core"
             ToggleDropDownMenu(nil, nil, menuFrame)
           end },
           { text = "View All", notCheckable = true, func = function()
-            ViewLimited()
+            MonDKP:ViewLimited()
+            core.CurSubView = "all"
             ToggleDropDownMenu(nil, nil, menuFrame, nil, nil, nil, nil, nil)
           end },
       }
@@ -363,7 +368,7 @@ local function RightClickMenu(self)
   end
 
   for i=1, #core.classes do       -- create Filter selections in context menu
-    menu[7].menuList[i] = { text = core.classes[i], isNotRadio = true, keepShownOnClick = true, checked = MonDKP.ConfigTab1.checkBtn[i]:GetChecked(), func = function()
+    menu[7].menuList[i] = { text = core.LocalClass[core.classes[i]], isNotRadio = true, keepShownOnClick = true, checked = MonDKP.ConfigTab1.checkBtn[i]:GetChecked(), func = function()
       MonDKP.ConfigTab1.checkBtn[i]:SetChecked(not MonDKP.ConfigTab1.checkBtn[i]:GetChecked())
       MonDKPFilterChecks(MonDKP.ConfigTab1.checkBtn[9])
       for j=1, #core.classes+1 do
@@ -476,27 +481,25 @@ local function CreateRow(parent, id) -- Create 3 buttons for each row in the lis
     f:SetScript("OnClick", DKPTable_OnClick)
     for i=1, 3 do
       f.DKPInfo[i] = f:CreateFontString(nil, "OVERLAY");
-      f.DKPInfo[i]:SetFontObject("GameFontHighlight");
-      f.DKPInfo[i]:SetFontObject("MonDKPSmallLeft")
+      f.DKPInfo[i]:SetFontObject("MonDKPSmallOutlineLeft")
       f.DKPInfo[i]:SetTextColor(1, 1, 1, 1);
       if (i==1) then
         f.DKPInfo[i].rowCounter = f:CreateFontString(nil, "OVERLAY");
-        f.DKPInfo[i].rowCounter:SetFontObject("GameFontWhiteTiny");
-        f.DKPInfo[i].rowCounter:SetFontObject("MonDKPSmallLeft")
+        f.DKPInfo[i].rowCounter:SetFontObject("MonDKPSmallOutlineLeft")
         f.DKPInfo[i].rowCounter:SetTextColor(1, 1, 1, 0.3);
         f.DKPInfo[i].rowCounter:SetPoint("LEFT", f, "LEFT", 3, -1);
       end
       if (i==3) then
         f.DKPInfo[i]:SetFontObject("MonDKPSmallLeft")
         f.DKPInfo[i].adjusted = f:CreateFontString(nil, "OVERLAY");
-        f.DKPInfo[i].adjusted:SetFontObject("MonDKPSmallLeft")
+        f.DKPInfo[i].adjusted:SetFontObject("MonDKPSmallOutlineLeft")
         f.DKPInfo[i].adjusted:SetScale("0.8")
         f.DKPInfo[i].adjusted:SetTextColor(1, 1, 1, 0.6);
         f.DKPInfo[i].adjusted:SetPoint("LEFT", f.DKPInfo[3], "RIGHT", 3, -1);
 
         if MonDKP_DB.modes.mode == "Roll Based Bidding" then
           f.DKPInfo[i].rollrange = f:CreateFontString(nil, "OVERLAY");
-          f.DKPInfo[i].rollrange:SetFontObject("MonDKPSmallLeft")
+          f.DKPInfo[i].rollrange:SetFontObject("MonDKPSmallOutlineLeft")
           f.DKPInfo[i].rollrange:SetScale("0.8")
           f.DKPInfo[i].rollrange:SetTextColor(1, 1, 1, 0.6);
           f.DKPInfo[i].rollrange:SetPoint("CENTER", 115, -1);
@@ -548,7 +551,7 @@ function DKPTable_Update()
       row.DKPInfo[1]:SetText(core.WorkingTable[index].player.." |cff444444("..rank..")|r")
       row.DKPInfo[1].rowCounter:SetText(index)
       row.DKPInfo[1]:SetTextColor(c.r, c.g, c.b, 1)
-      row.DKPInfo[2]:SetText(core.WorkingTable[index].class)
+      row.DKPInfo[2]:SetText(core.LocalClass[core.WorkingTable[index].class])
       row.DKPInfo[3]:SetText(MonDKP_round(core.WorkingTable[index].dkp, MonDKP_DB.modes.rounding))
       local CheckAdjusted = core.WorkingTable[index].dkp - core.WorkingTable[index].previous_dkp;
       if(CheckAdjusted > 0) then 
@@ -600,7 +603,7 @@ function DKPTable_Update()
         MonDKP.DKPTable.Rows[i]:GetNormalTexture():SetAlpha(0.7)
       end
       if core.WorkingTable[index].player == UnitName("player") and #core.SelectedData == 0 then
-        row.DKPInfo[2]:SetText("|cff00ff00"..core.WorkingTable[index].class.."|r")
+        row.DKPInfo[2]:SetText("|cff00ff00"..core.LocalClass[core.WorkingTable[index].class].."|r")
         row.DKPInfo[3]:SetText("|cff00ff00"..MonDKP_round(core.WorkingTable[index].dkp, MonDKP_DB.modes.rounding).."|r")
         MonDKP.DKPTable.Rows[i]:GetNormalTexture():SetAlpha(0.7)
       end
@@ -664,10 +667,6 @@ end
 function MonDKP:SeedVerify_Update()
   if IsInGuild() then
     local leader = MonDKP:GetGuildRankGroup(1)
-    
-    if leader[1].seed == "" or not tonumber(leader[1].seed) then    -- zeros out seed if no seed has been created yet
-      leader[1].seed = 0
-    end
 
     if MonDKP_DKPTable.seed >= leader[1].seed and MonDKP_Loot.seed >= leader[1].seed and MonDKP_DKPHistory.seed >= leader[1].seed then
       core.UpToDate = true;

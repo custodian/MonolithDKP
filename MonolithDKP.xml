@@ -11,13 +11,13 @@
 			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\homizio_bold.ttf" height="10"/>
 		</Member>
 		<Member alphabet="korean">
-			<Font font="Fonts\2002.TTF" height="15" outline="NORMAL"/>
+			<Font font="Fonts\2002.TTF" height="10" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="simplifiedchinese">
-			<Font font="Fonts\ARKai_C.ttf" height="14" outline="NORMAL"/>
+			<Font font="Fonts\ARKai_C.ttf" height="10" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="traditionalchinese">
-			<Font font="Fonts\bHEI01B.TTF" height="14" outline="NORMAL"/>
+			<Font font="Fonts\bHEI01B.TTF" height="10" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="russian">
 			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\ubuntu_bold.ttf" height="12"/>
@@ -28,13 +28,13 @@
 			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\homizio_bold.ttf" height="10" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="korean">
-			<Font font="Fonts\2002.TTF" height="15" outline="NORMAL"/>
+			<Font font="Fonts\2002.TTF" height="10" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="simplifiedchinese">
-			<Font font="Fonts\ARKai_C.ttf" height="14" outline="NORMAL"/>
+			<Font font="Fonts\ARKai_C.ttf" height="10" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="traditionalchinese">
-			<Font font="Fonts\bHEI01B.TTF" height="14" outline="NORMAL"/>
+			<Font font="Fonts\bHEI01B.TTF" height="10" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="russian">
 			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\ubuntu_bold.ttf" height="12" outline="NORMAL"/>
@@ -45,13 +45,13 @@
 			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\homizio_bold.ttf" height="12"/>
 		</Member>
 		<Member alphabet="korean">
-			<Font font="Fonts\2002.TTF" height="15" outline="NORMAL"/>
+			<Font font="Fonts\2002.TTF" height="12" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="simplifiedchinese">
-			<Font font="Fonts\ARKai_C.ttf" height="14" outline="NORMAL"/>
+			<Font font="Fonts\ARKai_C.ttf" height="12" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="traditionalchinese">
-			<Font font="Fonts\bHEI01B.TTF" height="14" outline="NORMAL"/>
+			<Font font="Fonts\bHEI01B.TTF" height="12" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="russian">
 			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\ubuntu_bold.ttf" height="12"/>
@@ -62,13 +62,13 @@
 			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\homizio_bold.ttf" height="12" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="korean">
-			<Font font="Fonts\2002.TTF" height="15" outline="NORMAL"/>
+			<Font font="Fonts\2002.TTF" height="12" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="simplifiedchinese">
-			<Font font="Fonts\ARKai_C.ttf" height="14" outline="NORMAL"/>
+			<Font font="Fonts\ARKai_C.ttf" height="12" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="traditionalchinese">
-			<Font font="Fonts\bHEI01B.TTF" height="14" outline="NORMAL"/>
+			<Font font="Fonts\bHEI01B.TTF" height="12" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="russian">
 			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\ubuntu_bold.ttf" height="12" outline="NORMAL"/>
@@ -79,13 +79,13 @@
 			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\homizio_bold.ttf" height="13"/>
 		</Member>
 		<Member alphabet="korean">
-			<Font font="Fonts\2002.TTF" height="15" outline="NORMAL"/>
+			<Font font="Fonts\2002.TTF" height="13" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="simplifiedchinese">
-			<Font font="Fonts\ARKai_C.ttf" height="14" outline="NORMAL"/>
+			<Font font="Fonts\ARKai_C.ttf" height="13" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="traditionalchinese">
-			<Font font="Fonts\bHEI01B.TTF" height="14" outline="NORMAL"/>
+			<Font font="Fonts\bHEI01B.TTF" height="13" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="russian">
 			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\ubuntu_bold.ttf" height="13"/>
@@ -96,13 +96,13 @@
 			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\homizio_bold.ttf" height="13" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="korean">
-			<Font font="Fonts\2002.TTF" height="15" outline="NORMAL"/>
+			<Font font="Fonts\2002.TTF" height="13" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="simplifiedchinese">
-			<Font font="Fonts\ARKai_C.ttf" height="14" outline="NORMAL"/>
+			<Font font="Fonts\ARKai_C.ttf" height="13" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="traditionalchinese">
-			<Font font="Fonts\bHEI01B.TTF" height="14" outline="NORMAL"/>
+			<Font font="Fonts\bHEI01B.TTF" height="13" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="russian">
 			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\ubuntu_bold.ttf" height="13" outline="NORMAL"/>
@@ -113,13 +113,13 @@
 			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\uf_font.ttf" height="24"/>
 		</Member>
 		<Member alphabet="korean">
-			<Font font="Fonts\2002.TTF" height="15" outline="NORMAL"/>
+			<Font font="Fonts\2002.TTF" height="24" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="simplifiedchinese">
-			<Font font="Fonts\ARKai_C.ttf" height="14" outline="NORMAL"/>
+			<Font font="Fonts\ARKai_C.ttf" height="24" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="traditionalchinese">
-			<Font font="Fonts\bHEI01B.TTF" height="14" outline="NORMAL"/>
+			<Font font="Fonts\bHEI01B.TTF" height="24" outline="NORMAL"/>
 		</Member>
 		<Member alphabet="russian">
 			<Font font="Interface\AddOns\MonolithDKP\Media\Fonts\uf_font.ttf" height="24"/>

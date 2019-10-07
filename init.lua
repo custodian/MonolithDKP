@@ -2,6 +2,8 @@ local _, core = ...;
 local _G = _G;
 local MonDKP = core.MonDKP;
 
+local lockouts = CreateFrame("Frame", "LockoutsFrame");
+
 --------------------------------------
 -- Slash Command
 --------------------------------------
@@ -24,6 +26,57 @@ MonDKP.Commands = {
 		else
 			MonDKP:Print("You do not have permission to access that feature.")
 		end
+	end,
+	["award"] = function (name, cost, ...)
+		if core.IsOfficer then
+			local item = strjoin(" ", ...)
+			local validation = MonDKP:Table_Search(MonDKP_DKPTable, name)
+
+			if not validation then 			-- validate command name, cost and itemlink
+				MonDKP:Print("Can not award item. Invalid Target Player")
+				return;
+			elseif not tonumber(cost) then
+				MonDKP:Print("Can not award item. Invalid Item Cost")
+				return;
+			elseif not strfind(item, "|Hitem:") then
+				MonDKP:Print("Can not award item. Invalid item link")
+				return;
+			end
+
+			StaticPopupDialogs["AWARD_CONFIRM"] = {
+				text = "Are you sure you'd like to award "..item.." to "..MonDKP_DKPTable[validation[1][1]].player.." for "..cost.." DKP?",
+				button1 = "Yes",
+				button2 = "No",
+				OnAccept = function()
+					local leader = MonDKP:GetGuildRankGroup(1)
+					local curTime = time();
+					local temp_table = {}
+
+					MonDKP:DKPTable_Set(name, "dkp", MonDKP_round(-cost, MonDKP_DB.modes.rounding), true)
+					table.insert(MonDKP_Loot, {player=MonDKP_DKPTable[validation[1][1]].player, loot=item, zone=MonDKP_DB.bossargs.CurrentRaidZone, date=curTime, cost=cost, boss=MonDKP_DB.bossargs.LastKilledBoss})
+					MonDKP:UpdateSeeds()
+					tinsert(temp_table, {seed = MonDKP_Loot.seed, {player=MonDKP_DKPTable[validation[1][1]].player, loot=item, zone=MonDKP_DB.bossargs.CurrentRaidZone, date=curTime, boss=MonDKP_DB.bossargs.LastKilledBoss, cost=cost}})
+					MonDKP:LootHistory_Reset();
+					MonDKP:LootHistory_Update("No Filter")
+					MonDKP:RosterSeedUpdate(leader[1].index)
+					MonDKP.Sync:SendData("MonDKPDataSync", MonDKP_DKPTable)
+					MonDKP.Sync:SendData("MonDKPLootAward", temp_table[1])
+					table.wipe(temp_table)
+				end,
+				timeout = 0,
+				whileDead = true,
+				hideOnEscape = true,
+				preferredIndex = 3,
+			}
+			StaticPopup_Show ("AWARD_CONFIRM")
+		else
+			MonDKP:Print("You do not have permission to access that feature.")
+		end
+	end,
+	["lockouts"] = function()
+		lockouts:RegisterEvent("UPDATE_INSTANCE_INFO");
+		lockouts:SetScript("OnEvent", MonDKP_OnEvent);
+		RequestRaidInfo()
 	end,
 	["timer"] = function(time, ...)
 		if time == nil then
@@ -49,8 +102,10 @@ MonDKP.Commands = {
 		MonDKP:Print("|cff00cc66/dkp|r - Launches DKP Window");
 		MonDKP:Print("|cff00cc66/dkp ?|r - Shows Help Info");
 		MonDKP:Print("|cff00cc66/dkp reset|r - Resets DKP Window Position/Size");
+		MonDKP:Print("|cff00cc66/dkp lockouts|r - Displays the next reset for each raid size (3 day, 5 day and 7 day lockouts)");
 		MonDKP:Print("|cff00cc66/dkp timer|r - Creates Raid Timer (Officers Only) (eg. /dkp timer 120 Pizza Break!)");
 		MonDKP:Print("|cff00cc66/dkp bid|r - Opens Bid Window (Officers Only) (eg. /dkp bid [item link])");
+		MonDKP:Print("|cff00cc66/dkp award player cost [item_link]|r - Manually Award Item (Officers Only) (eg. /dkp award roeshambo 100 [item link])");
 		MonDKP:Print("|cff00cc66/dkp modes|r - Opens DKP Modes Window (Officers Only)");
 		MonDKP:Print("|cff00cc66/dkp export|r - Opens window to export all DKP information to HTML, CSV or XML. (More export implementations to come)");
 		print(" ");
@@ -115,6 +170,19 @@ function MonDKP_OnEvent(self, event, arg1, ...)
 	if event == "ADDON_LOADED" then
 		MonDKP:OnInitialize(event, arg1)
 		self:UnregisterEvent("ADDON_LOADED")
+	elseif event == "BOSS_KILL" then
+		MonDKP:CheckOfficer()
+		if core.IsOfficer and IsInRaid() then
+			local boss_name = ...;
+
+			if MonDKP:Table_Search(core.EncounterList, arg1) then
+				MonDKP.ConfigTab2.BossKilledDropdown:SetValue(arg1)
+			end
+
+			if boss_name == "Azuregos" or boss_name == "Lord Kazzak" or boss_name == "Emeriss" or boss_name == "Lethon" or boss_name == "Ysondre" or boss_name == "Taerar" then 		-- requests IDs to be reported when discovered
+				MonDKP:Print("EventID: "..arg1.." - > "..boss_name.." Killed. Please report this Event ID at https://www.curseforge.com/wow/addons/monolith-dkp to update raid event handlers.")
+			end
+		end
 	elseif event == "CHAT_MSG_WHISPER" then
 		MonDKP:CheckOfficer()
 		if (core.BidInProgress or string.find(arg1, "!dkp") == 1) and core.IsOfficer == true then
@@ -131,6 +199,55 @@ function MonDKP_OnEvent(self, event, arg1, ...)
 		if (core.BidInProgress or string.find(arg1, "!dkp") == 1) and core.IsOfficer == true then
 			MonDKP_CHAT_MSG_WHISPER(arg1, ...)
 		end
+	elseif event == "UPDATE_INSTANCE_INFO" then
+		local num = GetNumSavedInstances()
+		local raidString, reset, newreset, days, hours, mins, maxPlayers, numEncounter, curLength;
+
+		if not MonDKP_DB.Lockouts then MonDKP_DB.Lockouts = {Three = 0, Five = 1570032000, Seven = 1569945600} end
+
+		for i=1, num do 		-- corrects reset timestamp for any raids where an active lockout exists
+			_,_,reset,_,_,_,_,_,maxPlayers,_,numEncounter = GetSavedInstanceInfo(i)
+			newreset = time() + reset + 2 	-- returned time is 2 seconds off
+
+			if maxPlayers == 40 and numEncounter > 1 then
+				curLength = "Seven"
+			elseif maxPlayers == 40 and numEncounter == 1 then
+				curLength = "Five"
+			elseif maxPlayers == 20 then
+				curLength = "Three"
+			end
+
+			if MonDKP_DB.Lockouts[curLength] < newreset then
+				MonDKP_DB.Lockouts[curLength] = newreset
+			end
+		end
+
+		-- Updates lockout timer if no lockouts were found to do so.
+		while MonDKP_DB.Lockouts.Three < time() do MonDKP_DB.Lockouts.Three = MonDKP_DB.Lockouts.Three + 259200 end
+		while MonDKP_DB.Lockouts.Five < time() do MonDKP_DB.Lockouts.Five = MonDKP_DB.Lockouts.Five + 432000 end
+		while MonDKP_DB.Lockouts.Seven < time() do MonDKP_DB.Lockouts.Seven = MonDKP_DB.Lockouts.Seven + 604800 end
+
+		for k,v in pairs(MonDKP_DB.Lockouts) do
+			reset = v - time();
+			days = math.floor(reset / 86400)
+			hours = math.floor(math.floor(reset % 86400) / 3600)
+			mins = math.ceil((reset % 3600) / 60)
+			
+			if days > 1 then days = " "..days.." days" elseif days == 0 then days = "" else days = " "..days.." day" end
+			if hours > 1 then hours = " "..hours.." hours" elseif hours == 0 then hours = "" else hours = " "..hours.." hour." end
+			if mins > 1 then mins = " "..mins.." minutes." elseif mins == 0 then mins = "" else mins = " "..mins.." minute." end
+
+			if k == "Three" then raidString = "ZG, AQ20"
+			elseif k == "Five" then raidString = "Onyxia"
+			elseif k == "Seven" then raidString = "MC, BWL, AQ40"
+			end
+
+			if k ~= "Three" then 	-- remove when three day raid lockouts are added
+				MonDKP:Print(raidString.." resets in"..days..hours..mins.." ("..date("%A @ %H:%M:%S%p", v)..")")
+			end
+		end
+
+		self:UnregisterEvent("UPDATE_INSTANCE_INFO");
 	elseif event == "CHAT_MSG_GUILD" then
 		MonDKP:CheckOfficer()
 		if (core.BidInProgress or string.find(arg1, "!dkp") == 1) and core.IsOfficer == true then
@@ -138,21 +255,15 @@ function MonDKP_OnEvent(self, event, arg1, ...)
 		end
 	--elseif event == "CHAT_MSG_SYSTEM" then
 		--MonoDKP_CHAT_MSG_SYSTEM(arg1)
-	--[[elseif event == "GROUP_ROSTER_UPDATE" then 			-- functionality unneccessary
-		if not C_GuildInfo.GuildRoster() then
-			MonDKP:CheckOfficer()
-			if core.IsOfficer == true then
-				AddRaidToDKPTable()
-			end
-		end--]]
-	elseif event == "GUILD_ROSTER_UPDATE" then 		-- checks if player is an officer on load
-		if IsInGuild() then
-			MonDKP:CheckOfficer()
-			if core.IsOfficer ~= "" then
-				self:UnregisterEvent("GUILD_ROSTER_UPDATE")
+	elseif event == "GROUP_ROSTER_UPDATE" then 			--updates raid listing if window is open
+		if core.MonDKPUI:IsShown() then
+			if core.CurSubView == "raid" then
+				MonDKP:ViewLimited(true)
+			elseif core.CurSubView == "raid and standby" then
+				MonDKP:ViewLimited(true, true)
 			end
 		end
-	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
+	--[[elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then 					-- replaced with above BOSS_KILL event handler
 		if IsInRaid() then 					-- only processes combat log events if in raid
 			local _,arg1,_,_,_,_,_,_,arg2 = CombatLogGetCurrentEventInfo();			-- run operation when boss is killed
 			if arg1 == "UNIT_DIED" then
@@ -160,18 +271,24 @@ function MonDKP_OnEvent(self, event, arg1, ...)
 				if core.IsOfficer == true then
 					if MonDKP:TableStrFind(core.BossList, arg2) then
 						MonDKP.ConfigTab2.BossKilledDropdown:SetValue(arg2)
+					elseif arg2 == "Flamewalker Elite" or arg2 == "Flamewalker Healer" then
+						MonDKP.ConfigTab2.BossKilledDropdown:SetValue("Majordomo Executus")
 					elseif arg2 == "Emperor Vek'lor" or arg2 == "Emperor Vek'nilash" then
 						MonDKP.ConfigTab2.BossKilledDropdown:SetValue("Twin Emperors")
 					elseif arg2 == "Princess Yauj" or arg2 == "Vem" or arg2 == "Lord Kri" then
 						MonDKP.ConfigTab2.BossKilledDropdown:SetValue("Bug Family")
 					elseif arg2 == "Highlord Mograine" or arg2 == "Thane Korth'azz" or arg2 == "Sir Zeliek" or arg2 == "Lady Blaumeux" then
 						MonDKP.ConfigTab2.BossKilledDropdown:SetValue("The Four Horsemen")
+					elseif arg2 == "Gri'lek" or arg2 == "Hazza'rah" or arg2 == "Renataki" or arg2 == "Wushoolay" then
+						MonDKP.ConfigTab2.BossKilledDropdown:SetValue("Edge of Madness")
 					end
 				end
 			end
-		end
+		end--]]
 	elseif event == "LOOT_OPENED" then
-		MonDKP_Register_ShiftClickLootWindowHook()
+		if IsInRaid() then
+			MonDKP_Register_ShiftClickLootWindowHook()
+		end
 	end
 end
 
@@ -226,7 +343,7 @@ function MonDKP:OnInitialize(event, name)		-- This is the FIRST function to run 
     		}
     	end
 		if not MonDKP_DB.bossargs then MonDKP_DB.bossargs = { CurrentRaidZone = "Molten Core", LastKilledBoss = "Lucifron" } end
-		if not MonDKP_DB.modes or not MonDKP_DB.modes.mode then MonDKP_DB.modes = { mode = "Minimum Bid Values", SubZeroBidding = false, rounding = 0, AddToNegative = false, increment = 60, ZeroSumBidType = "Static" } end;
+		if not MonDKP_DB.modes or not MonDKP_DB.modes.mode then MonDKP_DB.modes = { mode = "Minimum Bid Values", SubZeroBidding = false, rounding = 0, AddToNegative = false, increment = 60, ZeroSumBidType = "Static", AllowNegativeBidders = false } end;
 		if not MonDKP_DB.modes.ZeroSumBank then MonDKP_DB.modes.ZeroSumBank = { balance = 0 } end
 		if not MonDKP_DB.modes.channels then MonDKP_DB.modes.channels = { raid = true, whisper = true, guild = true } end
 		if not MonDKP_DB.modes.costvalue then MonDKP_DB.modes.costvalue = "Integer" end
@@ -251,6 +368,10 @@ function MonDKP:OnInitialize(event, name)		-- This is the FIRST function to run 
 		MonDKP:Print("Version "..core.MonVersion..", created and maintained by Roeshambo@Stalagg-PvP");
 		MonDKP:Print("Loaded "..#MonDKP_DKPTable.." player records, "..#MonDKP_Loot.." loot history records and "..#MonDKP_DKPHistory.." dkp history records.");
 		MonDKP:Print("Use /dkp ? for help and submit any bugs @ https://github.com/Roeshambo/MonolithDKP/issues");
+
+		for i=1, #MonDKP_DKPTable do
+			MonDKP_DKPTable[i].class = string.upper(MonDKP_DKPTable[i].class)		-- hotfix for migrating previous class listings to localization neutral classes
+		end
 		
 		core.MonDKPUI = MonDKP.UIConfig or MonDKP:CreateMenu();		-- creates main menu
 		MonDKP:StartBidTimer(seconds, nil)							-- initiates timer frame for use
@@ -268,10 +389,10 @@ events:RegisterEvent("ADDON_LOADED");
 events:RegisterEvent("GROUP_ROSTER_UPDATE");
 events:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 events:RegisterEvent("LOOT_OPENED")
-events:RegisterEvent("GUILD_ROSTER_UPDATE")
 events:RegisterEvent("CHAT_MSG_RAID")
 events:RegisterEvent("CHAT_MSG_RAID_LEADER")
 events:RegisterEvent("CHAT_MSG_WHISPER");
 events:RegisterEvent("CHAT_MSG_GUILD")
 events:RegisterEvent("GUILD_ROSTER_UPDATE")
+events:RegisterEvent("BOSS_KILL")
 events:SetScript("OnEvent", MonDKP_OnEvent); -- calls the above MonDKP_OnEvent function to determine what to do with the event

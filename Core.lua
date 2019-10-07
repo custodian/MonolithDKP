@@ -91,35 +91,51 @@ core.settings = {             -- From MonDKP_DB
 }
 
 ----------------------------------------------------
--- Boss List
+-- Boss/Encounter List
 -- search = MonDKP:Table_Search(core.BossList, "Lucifron") returns search[1] { 1 = MC, 2 = 1} (lucifron is at 1st spot in MC table)
 -- [1][1] will return "MC" and [1][2] will return "1" indicating the position of "Lucifron" in the MC table.
 -- core.BossList[search[1][1]][search[1][2]] would be core.BossList["MC"][1] = Lucifron
 --
 -- Can alternatively use tContains(core.BossList.MC, "Lucifron") for a true/false return if path isn't required
 ----------------------------------------------------
-core.BossList = {
-  MC = {"Lucifron", "Magmadar", "Gehennas",
-          "Garr", "Baron Geddon", "Shazzrah", "Sulfuron Harbinger", 
-          "Golemagg the Incinerator", "Majordomo Executus", "Ragnaros"},
-
-  BWL = {"Razorgore the Untamed", "Vaelastrasz the Corrupt", "Broodlord Lashlayer",
-          "Firemaw", "Ebonroc", "Flamegor", "Chromaggus", 
-          "Nefarian"},
-
-  AQ = {"The Prophet Skeram", "Battleguard Sartura", "Fankriss the Unyielding",
-          "Princess Huhuran", "Twin Emperors", "C'Thun", 
-          "Bug Family", "Viscidus", "Ouro"},
-
-  NAXX = {"Anub'Rekhan", "Grand Widow Faerlina", "Maexxna",
-          "Noth the Plaguebringer", "Heigan the Unclean", "Loatheb", 
-          "Instructor Razuvious", "Gothik the Harvester", "The Four Horsemen",
-          "Patchwerk", "Grobbulus", "Gluth", "Thaddius",
-        "Sapphiron", "Kel'Thuzad"}
+core.EncounterList = {      -- Event IDs must be in the exact same order as core.BossList declared in localization files
+  MC = {
+    663, 664, 665,
+    666, 668, 667, 669, 
+    670, 671, 672
+  },
+  BWL = {
+    610, 611, 612,
+    613, 614, 615, 616, 
+    617
+  },
+  AQ = {
+    709, 711, 712,
+    714, 715, 717, 
+    710, 713, 716
+  },
+  NAXX = {
+    1107, 1110, 1116,
+    1117, 1112, 1115, 
+    1113, 1109, 1121,
+    1118, 1111, 1108, 1120,
+    1119, 1114
+  },
+  ZG = {
+    787, 790, 793, 789, 784, 791,
+    785, 792, 786, 788
+  },
+  AQ20 = {
+    722, 721, 719, 718, 720, 723
+  },
+  ONYXIA = {1184},
+  --WORLD = {     -- No encounter IDs have been identified for these world bosses yet
+    --"Azuregos", "Lord Kazzak", "Emeriss", "Lethon", "Ysondre", "Taerar"
+  --}
 }
 
 core.MonDKPUI = {}        -- global storing entire Configuration UI to hide/show UI
-core.MonVersion = "v2.0.0.basil.20190925.1";
+core.MonVersion = "v2.0.0.basil.20191009.1";
 core.TableWidth, core.TableRowHeight, core.TableNumRows = 500, 18, 27; -- width, row height, number of rows
 core.SelectedData = { player="none"};         -- stores data of clicked row for manipulation.
 core.classFiltered = {};   -- tracks classes filtered out with checkboxes
@@ -133,6 +149,7 @@ core.NumLootItems = 0;        -- updates on LOOT_OPENED event
 core.CurrentRaidZone = ""
 core.LastKilledBoss = ""
 core.CurView = "all"
+core.CurSubView = "all"
 
 function MonDKP:GetCColors(class)
   if core.CColors then 
@@ -264,6 +281,22 @@ function MonDKP:RosterSeedUpdate(index)
 	else
 	    note = note .. " " .. textseed
 	end
+
+  if strlen(note) > 31 then   -- validates note length. If it's too long for the public note, truncates it to fit the seed.
+    note = strsub(note, 1, 9)
+    note = note .. " " .. textseed
+
+    StaticPopupDialogs["SEED_VALIDATE"] = {
+      text = "Guild Leaders public note was too long. Truncated note to fit DKP Table timestamp. (31 character max)",
+      button1 = "Ok",
+      timeout = 0,
+      whileDead = true,
+      hideOnEscape = true,
+      preferredIndex = 3,
+    }
+    StaticPopup_Show ("SEED_VALIDATE")
+  end
+
 	GuildRosterSetPublicNote(index, note)
 	return newseed
 end
@@ -328,7 +361,7 @@ function MonDKP:PurgeDKPHistory()     -- cleans old DKP history beyond history l
 end
 
 function MonDKP:FormatTime(time)
-  local TZ = date("%Z") -- Time Zone
+  --local TZ = date("%Z") -- Time Zone
   local str;
 
   --[[if strfind(TZ, "Eastern") then

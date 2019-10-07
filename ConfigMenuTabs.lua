@@ -166,7 +166,7 @@ function MonDKP:ConfigMenuTabs()
     if i <= 9 then MonDKP.ConfigTab1.checkBtn[i]:SetChecked(true) else MonDKP.ConfigTab1.checkBtn[i]:SetChecked(false) end;
     MonDKP.ConfigTab1.checkBtn[i]:SetID(i)
     if i <= 8 then
-      MonDKP.ConfigTab1.checkBtn[i].text:SetText("|cff5151de"..core.classes[i].."|r");
+      MonDKP.ConfigTab1.checkBtn[i].text:SetText("|cff5151de"..core.LocalClass[core.classes[i]].."|r");
     end
     if i==9 then
       MonDKP.ConfigTab1.checkBtn[i]:SetScript("OnClick",
@@ -196,7 +196,7 @@ function MonDKP:ConfigMenuTabs()
   end
 
   -- Class Check Buttons:
-  MonDKP.ConfigTab1.checkBtn[1]:SetPoint("TOPLEFT", MonDKP.ConfigTab1, "TOPLEFT", 60, -100);
+  MonDKP.ConfigTab1.checkBtn[1]:SetPoint("TOPLEFT", MonDKP.ConfigTab1, "TOPLEFT", 85, -70);
   MonDKP.ConfigTab1.checkBtn[2]:SetPoint("TOPLEFT", MonDKP.ConfigTab1.checkBtn[1], "TOPRIGHT", 50, 0);
   MonDKP.ConfigTab1.checkBtn[3]:SetPoint("TOPLEFT", MonDKP.ConfigTab1.checkBtn[2], "TOPRIGHT", 50, 0);
   MonDKP.ConfigTab1.checkBtn[4]:SetPoint("TOPLEFT", MonDKP.ConfigTab1.checkBtn[3], "TOPRIGHT", 50, 0);
